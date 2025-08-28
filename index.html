@@ -10,28 +10,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Usa min-height per una migliore flessibilità */
+            min-height: 100vh;
             background-color: #f0f0f0;
             margin: 0;
             flex-direction: column;
-            padding: 10px; /* Aggiungi un po' di spazio ai lati */
-            box-sizing: border-box; /* Assicura che il padding non causi overflow */
+            padding: 10px;
+            box-sizing: border-box;
         }
 
+        /* --- MODIFICA CHIAVE QUI --- */
         #game-board {
             display: grid;
-            /* Usa 'autofit' e 'minmax' per creare una griglia flessibile.
-               Le colonne avranno una dimensione minima di 90px e si adatteranno
-               per riempire lo spazio disponibile. */
-            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            /* Forza una griglia di 4 colonne di uguale larghezza (1fr) */
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
-            width: 100%; /* Occupa tutta la larghezza disponibile */
-            max-width: 500px; /* Imposta una larghezza massima per schermi grandi */
+            width: 100%;
+            max-width: 500px; /* Limita la dimensione massima su schermi grandi */
+            /* Fa in modo che l'intera griglia mantenga un rapporto 1:1 (quadrato) */
+            aspect-ratio: 1 / 1;
         }
+        /* --- FINE MODIFICA --- */
 
         .card {
-            /* Usa l'aspect-ratio per mantenere le carte quadrate in modo responsive */
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 1 / 1; /* Mantiene le singole carte quadrate */
             background-color: #4CAF50;
             display: flex;
             justify-content: center;
@@ -63,7 +64,7 @@
 
         .card-front {
             background-color: #4CAF50;
-            background-image: url('card_back.png'); /* Immagine per il retro di tutte le carte */
+            background-image: url('card_back.png');
             background-size: cover;
             background-position: center;
         }
@@ -101,7 +102,7 @@
             font-size: 22px;
             font-weight: bold;
             color: #333;
-            text-align: center; /* Centra il testo del messaggio */
+            text-align: center;
         }
     </style>
 </head>
@@ -117,8 +118,6 @@
             const restartButton = document.getElementById('restart-button');
             const messageDiv = document.getElementById('message');
 
-            // *** I NOMI DEI FILE IMMAGINE SONO STATI AGGIORNATI ***
-            // Assicurati che le immagini siano nella cartella 'lefoto'.
             const imageFiles = [
                 'lefoto/canotto.png',
                 'lefoto/cisterna.png',
@@ -129,9 +128,8 @@
                 'lefoto/panettone.png',
                 'lefoto/verticale.png'
             ];
-            // *******************************************************
 
-            let cards = [...imageFiles, ...imageFiles]; // Duplica per creare le coppie
+            let cards = [...imageFiles, ...imageFiles];
             let flippedCards = [];
             let matchedCards = [];
 
@@ -200,7 +198,7 @@
 
             restartButton.addEventListener('click', createBoard);
 
-            createBoard(); // Inizializza il gioco all'apertura della pagina
+            createBoard();
         });
     </script>
 </body>
