@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gioco di Memoria con Immagini</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            flex-direction: column;
+            overflow: hidden; /* Evita scrollbar indesiderate se il contenuto è al limite */
+        }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 120px); /* Aumentato leggermente per le immagini */
+            grid-gap: 10px;
+        }
+        .card {
+            width: 120px; /* Larghezza della carta */
+            height: 120px; /* Altezza della carta */
+            background-color: #4CAF50; /* Colore del retro della carta */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            perspective: 1000px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            border-radius: 8px; /* Bordi leggermente arrotondati */
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2); /* Ombra per profondità */
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            overflow: hidden; /* Assicura che le immagini non escano dai bordi */
+        }
+        .card-front {
+            background-color: #4CAF50; /* Colore del fronte (quando la carta è coperta) */
+            background-image: url('card_back.png'); /* Immagine per il retro di tutte le carte */
+            background-size: cover; /* Copre l'intera area della carta */
+            background-position: center; /* Centra l'immagine */
+        }
+        .card-back {
+            background-color: #fff;
+            transform: rotateY(180deg);
+        }
+        .card-back img {
+            max-width: 100%;
+            max-height: 100%;
+            display: block; /* Rimuove spazi extra sotto l'immagine */
+            object-fit: cover; /* Copre l'intera area, tagliando se necessario */
+        }
+        #restart-button {
+            margin-top: 20px;
+            padding: 12px 25px; /* Pulsante più grande */
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        #restart-button:hover {
+            background-color: #0056b3;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-board"></div>
+    <button id="restart-button">Ricomincia</button>
+    <div id="message"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameBoard = document.getElementById('game-board');
+            const restartButton = document.getElementById('restart-button');
+            const messageDiv = document.getElementById('message');
+
+            // *** QUI INSERISCI I NOMI DEI TUOI FILE IMMAGINE ***
+            // Assicurati che le immagini siano nella stessa cartella del file HTML.
+            // Devi avere 8 immagini diverse, i cui nomi finiscono con .jpg, .png o .gif
+            const imageFiles = [
+                'canotto.png',
+                'cisterna.png',
+                'cisternainterro.png',
+                'exagon.png',
+                'jolly.png',
+                'logo.png',
+                'panettone.png',
+                'verticale.png'
+            ];
+            // *************************************************
+
+            let cards = [...imageFiles, ...imageFiles]; // Duplica per creare le coppie
+            let flippedCards = [];
+            let matchedCards = [];
+
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function createBoard() {
+                gameBoard.innerHTML = '';
+                messageDiv.textContent = '';
+                matchedCards = [];
+                shuffle(cards);
+                cards.forEach(imageSrc => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.dataset.image = imageSrc; // Usa l'attributo data-image per memorizzare il percorso
+
+                    const cardFront = document.createElement('div');
+                    cardFront.classList.add('card-face', 'card-front');
+                    // Il retro di tutte le carte è impostato via CSS (card_back.png)
+
+                    const cardBack = document.createElement('div');
+                    cardBack.classList.add('card-face', 'card-back');
+                    const img = document.createElement('img');
+                    img.src = imageSrc; // Questa è l'immagine specifica della carta
+                    img.alt = 'Memory Card Image';
+                    cardBack.appendChild(img);
+
+                    card.appendChild(cardFront);
+                    card.appendChild(cardBack);
+
+                    card.addEventListener('click', flipCard);
+                    gameBoard.appendChild(card);
+                });
+            }
+
+            function flipCard() {
+                if (flippedCards.length < 2 && !this.classList.contains('flipped') && !matchedCards.includes(this)) {
+                    this.classList.add('flipped');
+                    flippedCards.push(this);
+
+                    if (flippedCards.length === 2) {
+                        checkForMatch();
+                    }
+                }
+            }
+
+            function checkForMatch() {
+                const [card1, card2] = flippedCards;
+                if (card1.dataset.image === card2.dataset.image) {
+                    matchedCards.push(card1, card2);
+                    flippedCards = [];
+                    if (matchedCards.length === cards.length) {
+                        messageDiv.textContent = 'Complimenti, hai vinto!';
+                    }
+                } else {
+                    setTimeout(() => {
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        flippedCards = [];
+                    }, 1000);
+                }
+            }
+
+            restartButton.addEventListener('click', createBoard);
+
+            createBoard(); // Inizializza il gioco all'apertura della pagina
+        });
+    </script>
+</body>
+</html>
