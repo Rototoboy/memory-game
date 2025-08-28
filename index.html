@@ -10,21 +10,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh; /* Usa min-height per una migliore flessibilità */
             background-color: #f0f0f0;
             margin: 0;
             flex-direction: column;
-            overflow: hidden; /* Evita scrollbar indesiderate se il contenuto è al limite */
+            padding: 10px; /* Aggiungi un po' di spazio ai lati */
+            box-sizing: border-box; /* Assicura che il padding non causi overflow */
         }
+
         #game-board {
             display: grid;
-            grid-template-columns: repeat(4, 120px); /* Aumentato leggermente per le immagini */
-            grid-gap: 10px;
+            /* Usa 'autofit' e 'minmax' per creare una griglia flessibile.
+               Le colonne avranno una dimensione minima di 90px e si adatteranno
+               per riempire lo spazio disponibile. */
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 10px;
+            width: 100%; /* Occupa tutta la larghezza disponibile */
+            max-width: 500px; /* Imposta una larghezza massima per schermi grandi */
         }
+
         .card {
-            width: 120px; /* Larghezza della carta */
-            height: 120px; /* Altezza della carta */
-            background-color: #4CAF50; /* Colore del retro della carta */
+            /* Usa l'aspect-ratio per mantenere le carte quadrate in modo responsive */
+            aspect-ratio: 1 / 1;
+            background-color: #4CAF50;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -33,12 +41,14 @@
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.6s;
-            border-radius: 8px; /* Bordi leggermente arrotondati */
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.2); /* Ombra per profondità */
+            border-radius: 8px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
         }
+
         .card.flipped {
             transform: rotateY(180deg);
         }
+
         .card-face {
             position: absolute;
             width: 100%;
@@ -48,27 +58,31 @@
             justify-content: center;
             align-items: center;
             border-radius: 8px;
-            overflow: hidden; /* Assicura che le immagini non escano dai bordi */
+            overflow: hidden;
         }
+
         .card-front {
-            background-color: #4CAF50; /* Colore del fronte (quando la carta è coperta) */
+            background-color: #4CAF50;
             background-image: url('card_back.png'); /* Immagine per il retro di tutte le carte */
-            background-size: cover; /* Copre l'intera area della carta */
-            background-position: center; /* Centra l'immagine */
+            background-size: cover;
+            background-position: center;
         }
+
         .card-back {
             background-color: #fff;
             transform: rotateY(180deg);
         }
+
         .card-back img {
             max-width: 100%;
             max-height: 100%;
-            display: block; /* Rimuove spazi extra sotto l'immagine */
-            object-fit: cover; /* Copre l'intera area, tagliando se necessario */
+            display: block;
+            object-fit: cover;
         }
+
         #restart-button {
             margin-top: 20px;
-            padding: 12px 25px; /* Pulsante più grande */
+            padding: 12px 25px;
             font-size: 18px;
             cursor: pointer;
             border: none;
@@ -77,14 +91,17 @@
             color: white;
             transition: background-color 0.3s ease;
         }
+
         #restart-button:hover {
             background-color: #0056b3;
         }
+
         #message {
             margin-top: 20px;
             font-size: 22px;
             font-weight: bold;
             color: #333;
+            text-align: center; /* Centra il testo del messaggio */
         }
     </style>
 </head>
@@ -100,9 +117,8 @@
             const restartButton = document.getElementById('restart-button');
             const messageDiv = document.getElementById('message');
 
-            // *** QUI INSERISCI I NOMI DEI TUOI FILE IMMAGINE ***
-            // Assicurati che le immagini siano nella stessa cartella del file HTML.
-            // Devi avere 8 immagini diverse, i cui nomi finiscono con .jpg, .png o .gif
+            // *** I NOMI DEI FILE IMMAGINE SONO STATI AGGIORNATI ***
+            // Assicurati che le immagini siano nella cartella 'lefoto'.
             const imageFiles = [
                 'lefoto/canotto.png',
                 'lefoto/cisterna.png',
@@ -113,7 +129,7 @@
                 'lefoto/panettone.png',
                 'lefoto/verticale.png'
             ];
-            // *************************************************
+            // *******************************************************
 
             let cards = [...imageFiles, ...imageFiles]; // Duplica per creare le coppie
             let flippedCards = [];
@@ -134,16 +150,15 @@
                 cards.forEach(imageSrc => {
                     const card = document.createElement('div');
                     card.classList.add('card');
-                    card.dataset.image = imageSrc; // Usa l'attributo data-image per memorizzare il percorso
+                    card.dataset.image = imageSrc;
 
                     const cardFront = document.createElement('div');
                     cardFront.classList.add('card-face', 'card-front');
-                    // Il retro di tutte le carte è impostato via CSS (card_back.png)
 
                     const cardBack = document.createElement('div');
                     cardBack.classList.add('card-face', 'card-back');
                     const img = document.createElement('img');
-                    img.src = imageSrc; // Questa è l'immagine specifica della carta
+                    img.src = imageSrc;
                     img.alt = 'Memory Card Image';
                     cardBack.appendChild(img);
 
@@ -189,5 +204,4 @@
         });
     </script>
 </body>
-
 </html>
